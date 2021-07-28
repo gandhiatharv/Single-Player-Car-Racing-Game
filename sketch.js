@@ -2,11 +2,11 @@ var playercar,playercarimg;
 
 var road, roadimg;
 
-var car;
+var car100;
 
-var score;
-
-var logo;
+var coin, coinimg, coinGroup;
+var score = 0;
+var distance = 0;
 
 var cargroup;
 
@@ -22,12 +22,13 @@ var cursor1;
 var resetimg;
 
 
-
 var pausereset;
 
 var pausereset;
 
-var startgame
+var boundary3, boundary4;
+
+var startgame, boundary, boundary2;
 
 function preload(){
   
@@ -39,7 +40,6 @@ function preload(){
 
   audio = loadSound("melodyloops-adrenaline.mp3")
   
-  logoimg = loadImage("logoforgame.png")
   
  pic = loadImage("police.png");
   
@@ -63,53 +63,45 @@ resetimg = loadImage("resetbutton.png");
   
   mycursor = loadImage("myawesomecursor.png")
   
-  
+  coinimg = loadImage("coin.png");
 
   
 }
 
 function setup(){
-  createCanvas(windowWidth,windowHeight);
+  createCanvas(displayWidth,displayHeight);
   
     
   
-  road = createSprite(width/2,200,10,10);
+  road = createSprite(width/2,displayHeight/2,10,10);
   road.addAnimation("roadimg",roadimg);
-  road.scale = 2
-  
-  road1 = createSprite(width/2,600,10,10);
-  road1.addAnimation("roadimg",roadimg);
-  road1.scale = 1.350
-  
-  
- 
-  score = 0;
-  
+  road.scale = displayHeight/410;
 
+  boundary = createSprite(0, displayHeight/2, 10, displayHeight);
+  boundary.visible = false;
+  boundary2 = createSprite(displayWidth, displayHeight/2, 10, displayHeight);
+  boundary2.visible = false;
+  boundary3 = createSprite(displayWidth/2, 0, displayWidth, 10);
+  boundary3.visible = false;
+  boundary4 = createSprite(displayWidth/2, displayHeight, displayWidth, 10);
+  boundary4.visible = false;
   
-    road2 = createSprite(width/2,400,10,10);
-  road2.addAnimation("roadimg",roadimg);
-  road2.scale = 1.350;
   
   
-  
-   startgame = createSprite(width/2,300,10,10);
+   startgame = createSprite(width/2,displayHeight/2);
+   console.log(stateimg.height);
+   console.log(displayHeight);
    startgame.addImage(stateimg)
-  startgame.scale = 3
   startgame.visible = false;
   
-      start = createSprite(width/2,height-300,40,20);
+      start = createSprite(width/2,height/1.15,40,20);
       start.addImage(startimg)
-      start.scale = 0.150;
+      start.scale = 0.15;
   
-  over = createSprite(width/2,100,20,20);
+  over = createSprite(width/2,height/15,20,20);
   over.visible = false;
   over.addImage(resetimg);
   over.scale = 0.7
-  
-  logo = createSprite(width/2,height-600,20,20);
-  logo.addImage(logoimg)
-  logo.scale = 2;
   
   //noCursor();
 
@@ -117,16 +109,17 @@ function setup(){
   cursor1.addImage(mycursor);
   cursor1.scale = 0.1*/
   
-  car = createSprite(800,320,10,10);
-  car.addImage(carimg);
-  car.scale = 0.150;
+  car100 = createSprite(displayWidth/2.1,displayHeight/1.1,10,10);
+  car100.addImage(carimg);
+  car100.scale = 0.150;
+
   
   /*cursor1 = createSprite(mouseX-10, mouseY, 20, 20);
   cursor1.addImage(mycursor);
   cursor1.scale = 0.1*/
   
   cargroup = new Group();
-  
+  coinGroup = new Group();
   
   GAMESTATE = 3;
     PAUSESTATE = 2;
@@ -135,7 +128,7 @@ function setup(){
   STARTSTATE = 3;
 
 
-over.depth = car.depth + 1;
+over.depth = car100.depth + 1;
 over.depth = cargroup.depth;
 over.depth = over.depth + 1;
   
@@ -145,8 +138,11 @@ over.depth = over.depth + 1;
 
 function draw(){
   background("lightgreen");
-  
-  //score = score + Math.round(getFrameRate()/60);
+
+  car100.collide(boundary);
+  car100.collide(boundary2);
+  car100.collide(boundary3);
+  car100.collide(boundary4);
 
 
 
@@ -155,31 +151,36 @@ function draw(){
 
   
 if(GAMESTATE === PLAY) {
-   car.visible = true;
+  distance = distance + Math.round(getFrameRate()/60);
+   car100.visible = true;
         
   
-   if(frameCount%1980 === 0){
+   if(frameCount%1890 === 0){
      audio.play();
    }
 
-        road1.velocityY = 10;
-      road2.velocityY = 10;
-      road.velocityY =  10;
-  
+        road.velocityY = (7 + 2*distance/150);
+        
   
       spawnTRUCK();
       spawncar();
       taxi();
       fire1();
       purple();
+      spawnCoins();
   
-  if(car.isTouching(cargroup)) {
-      road1.velocityY = 0;
-      road2.velocityY = 0;
-      road.velocityY =  0;
+  if(car100.isTouching(cargroup)) {
+    road.velocityY =  0;
       cargroup.setVelocityYEach(0);
+      coinGroup.setVelocityYEach(0);
       GAMESTATE = END;
-      cargroup.setLifetimeEach(-1)
+      cargroup.setLifetimeEach(-1);
+      coinGroup.setLifetimeEach(-1);
+}
+
+if(car100.isTouching(coinGroup)) {
+  score = score + 1;
+  coinGroup.destroyEach();
 }
   
 
@@ -189,31 +190,34 @@ if(GAMESTATE === PLAY) {
           cargroup.destroyEach()
         }
   
-     if (road.y > 400)  {
+     if (road.y > displayHeight/4)  {
     road.y = 0;
   }
   
   if(cargroup.isTouching(cargroup)) {
       cargroup.destroyEach();
   }
-    
-    if (road1.y > 400)  {
-    road1.y = 0
-  }
-  
-      if (road2.y > 200)  {
-    road2.y = -100
-  }
 
   if (keyDown("LEFT_ARROW")) 
   {
-      car.x = car.x-5;
+      car100.x = car100.x-15;
   }
   
     if (keyDown("RIGHT_ARROW")) 
   {
-      car.x = car.x+5;
+      car100.x = car100.x+15;
   }
+
+  if (keyDown("UP_ARROW")) 
+  {
+      car100.y = car100.y-15;
+  }
+
+  if (keyDown("DOWN_ARROW")) 
+  {
+      car100.y = car100.y+15;
+  }
+
  } else if(GAMESTATE === END) {
        // PP = createSprite(200,200,50,50)
        over.visible = true;
@@ -224,16 +228,15 @@ if(GAMESTATE === PLAY) {
        }
    } else if (GAMESTATE === STARTSTATE) {
       startgame.visible = true;
-      car.visible = false;
+      car100.visible = false;
 
       
 
-      if (mousePressedOver(start)) {
+      if (mousePressedOver(start)||mousePressedOver(startgame)) {
             reset();
           start.visible = false;
           startgame.visible = false;
           audio.play();
-          logo.visible = false;
       }
       
    }
@@ -241,19 +244,24 @@ if(GAMESTATE === PLAY) {
   
   drawSprites();
 
- // text("Score: "+ score, 500,50);
-
-  
+if(GAMESTATE === PLAY || GAMESTATE === END){
+  textSize(25);
+  fill("lightgreen");
+  strokeWeight(2); 
+  stroke("lightblue");
+  text("Score: " + score, displayWidth/1.1, displayHeight/18);
+  text("Distance: " + distance, displayWidth/30, displayHeight/18);
+}
 }
 
 function spawnTRUCK() {
   
   if (frameCount % 200 === 0) {
     var car = createSprite(400,0,40,10);
-    car.x = Math.round(random(width/2,width/5));
+    car.x = Math.round(random(0, displayWidth));
     car.addImage(MONSTERTRUCK);
     car.scale = 0.8;
-    car.velocityY = Math.round(random(10,20))
+    car.velocityY = road.velocityY;
     
      //assign lifetime to the variable
     car.lifetime = 200;
@@ -273,10 +281,10 @@ function spawncar() {
   
   if (frameCount % 280 === 0) {
     var car = createSprite(400,0,40,10);
-    car.x = Math.round(random(width/1.5,width/5.5));
+    car.x = Math.round(random(0, displayWidth));
     car.addImage(pic);
     car.scale = 0.350
-    car.velocityY = Math.round(random(8,20))
+    car.velocityY = road.velocityY;
     
      //assign lifetime to the variable
     car.lifetime = 200;
@@ -297,10 +305,10 @@ function taxi() {
     
   if (frameCount % 120 === 0) {
     var car = createSprite(width/2,-30,40,10);
-    car.x = Math.round(random(width/1.5,width/4));
+    car.x = Math.round(random(0, displayWidth));
     car.addImage(taxi1);
     car.scale = 0.4;
-    car.velocityY = 14;
+    car.velocityY = road.velocityY;
     car.depth = over.depth-1;
 
      //assign lifetime to the variable
@@ -317,11 +325,12 @@ function taxi() {
 function fire1() {
   if (frameCount % 300 === 0) {
     var car = createSprite(width/2,height-50,40,10);
-    car.x = Math.round(random(width/2,width/3.4));
+    car.x = Math.round(random(0, displayWidth));
   
     car.addImage(fire);
     car.scale = 1
-    car.velocityY = Math.round(random(-10,-20))
+    car.velocityY = road.velocityY;
+    car.depth = over.depth-1;
 
      //assign lifetime to the variable
     car.lifetime = 200;
@@ -336,11 +345,11 @@ function fire1() {
 function purple() {
   if (frameCount % 150 === 0) {
     var car = createSprite(width/2,-20,40,10);
-    car.x = Math.round(random(width/2,width/4));
+    car.x = Math.round(random(0, displayWidth));
   
     car.addImage(purple1);
     car.scale = 0.375
-    car.velocityY = Math.round(random(15,20))
+    car.velocityY = road.velocityY;
     car.depth = over.depth-1;
 
      //assign lifetime to the variable
@@ -353,20 +362,38 @@ function purple() {
       }
   }
 
+  function spawnCoins(){
+    if (frameCount % 150 === 0) {
+      var coin = createSprite(0, 0, 0, 0);
+      coin.x = Math.round(random(0, displayWidth));
+    
+      coin.addImage(coinimg);
+      coin.scale = 0.05;
+      coin.velocityY = road.velocityY+2.5;
+      coin.depth = over.depth-1;
+  
+       //assign lifetime to the variable
+      coin.lifetime = 200;
+//coin.debug = true;    
+      coinGroup.add(coin);
+    // car.debug = true;
+  
+        }
+  }
+
 function reset() {
   GAMESTATE = PLAY;
   
-  
-  car.x = width/2;
-  car.y = height-200;
+  distance = 0;
+  score = 0;
+  car100.x = width/2.05;
+  car100.y = height/1.7;
  // cargroup.setVelocityYEach(Math.round(random(5,20)));
 
-  road1.velocityY = 10
     road.velocityY = 10
-  road2.velocityY = 10;
   over.visible = false;
   cargroup.destroyEach();
-  
+  coinGroup.destroyEach();
 
 }
 
