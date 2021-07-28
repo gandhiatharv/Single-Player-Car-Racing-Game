@@ -155,7 +155,7 @@ if(GAMESTATE === PLAY) {
    car100.visible = true;
         
   
-   if(frameCount%1890 === 0){
+   if(frameCount%2000 === 0){
      audio.play();
    }
 
