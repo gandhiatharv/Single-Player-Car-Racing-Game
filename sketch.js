@@ -66,6 +66,7 @@ resetimg = loadImage("resetbutton.png");
   coinimg = loadImage("coin.png");
 
   collect = loadSound("collect.mp3");
+  
   obstaclehit = loadSound("obstaclehit.mp3");
 }
 
@@ -99,7 +100,7 @@ function setup(){
       start.addImage(startimg)
       start.scale = 0.15;
   
-  over = createSprite(width/2,height/15,20,20);
+  over = createSprite(width/2,height/10,20,20);
   over.visible = false;
   over.addImage(resetimg);
   over.scale = 0.7
