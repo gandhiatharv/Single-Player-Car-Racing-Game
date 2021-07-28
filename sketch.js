@@ -28,7 +28,7 @@ var pausereset;
 
 var boundary3, boundary4;
 
-var startgame, boundary, boundary2;
+var startgame, boundary, boundary2, obstaclehit, collect;
 
 function preload(){
   
@@ -65,7 +65,8 @@ resetimg = loadImage("resetbutton.png");
   
   coinimg = loadImage("coin.png");
 
-  
+  collect = loadSound("collect.mp3");
+  obstaclehit = loadSound("obstaclehit.mp3");
 }
 
 function setup(){
@@ -155,7 +156,7 @@ if(GAMESTATE === PLAY) {
    car100.visible = true;
         
   
-   if(frameCount%2000 === 0){
+   if(frameCount%1890 === 0){
      audio.play();
    }
 
@@ -170,6 +171,9 @@ if(GAMESTATE === PLAY) {
       spawnCoins();
   
   if(car100.isTouching(cargroup)) {
+    if(road.velocityY > 0){
+      obstaclehit.play();
+    }
     road.velocityY =  0;
       cargroup.setVelocityYEach(0);
       coinGroup.setVelocityYEach(0);
@@ -181,6 +185,7 @@ if(GAMESTATE === PLAY) {
 if(car100.isTouching(coinGroup)) {
   score = score + 1;
   coinGroup.destroyEach();
+  collect.play();
 }
   
 
@@ -264,7 +269,7 @@ function spawnTRUCK() {
     car.velocityY = road.velocityY;
     
      //assign lifetime to the variable
-    car.lifetime = 200;
+    car.lifetime = 500;
     car.depth = over.depth-1;
     
        // car.debug= true;
@@ -287,7 +292,7 @@ function spawncar() {
     car.velocityY = road.velocityY;
     
      //assign lifetime to the variable
-    car.lifetime = 200;
+    car.lifetime = 500;
     car.depth = over.depth-1;
 
        // car.debug= true;
@@ -312,7 +317,7 @@ function taxi() {
     car.depth = over.depth-1;
 
      //assign lifetime to the variable
-    car.lifetime = 200;
+    car.lifetime = 500;
    // car.debug= true;
     car.setCollider("rectangle",10,0,100,400)
     
@@ -333,7 +338,7 @@ function fire1() {
     car.depth = over.depth-1;
 
      //assign lifetime to the variable
-    car.lifetime = 200;
+    car.lifetime = 500;
     car.setCollider("rectangle",199,0,-60,230);
   
     cargroup.add(car);
@@ -353,7 +358,7 @@ function purple() {
     car.depth = over.depth-1;
 
      //assign lifetime to the variable
-    car.lifetime = 200;
+    car.lifetime = 500;
     car.setCollider("rectangle",0,0,-140,389);
   
     cargroup.add(car);
@@ -373,7 +378,7 @@ function purple() {
       coin.depth = over.depth-1;
   
        //assign lifetime to the variable
-      coin.lifetime = 200;
+      coin.lifetime = 500;
 //coin.debug = true;    
       coinGroup.add(coin);
     // car.debug = true;
