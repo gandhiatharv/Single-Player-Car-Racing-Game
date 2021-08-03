@@ -45,7 +45,7 @@ function preload(){
   
  taxi1 = loadImage("taxi.png");
   
- fire = loadImage("firewicket.png");
+ fire = loadImage("firewicket1.png");
   
 resetimg = loadImage("resetbutton.png");
   
