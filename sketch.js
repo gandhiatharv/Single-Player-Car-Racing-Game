@@ -157,9 +157,10 @@ if(GAMESTATE === PLAY) {
    car100.visible = true;
         
   
-    if (!audio.isPlaying()) {
-    audio.play();
-  }
+if(frameCount%1890 === 0){
+  audio.stop();
+audio.play();
+}
 
         road.velocityY = (7 + 2*distance/150);
         
